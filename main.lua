@@ -20,7 +20,7 @@ end)
 -- ============================================================
 -- KEY SYSTEM CONFIGURATION (Must match index.html)
 -- ============================================================
-local KEY_WEBSITE_URL = "https://your-website-link.com" -- Replace with your hosted index.html URL
+local KEY_WEBSITE_URL = "https://sid-key-portal.netlify.app/" -- Replace with your hosted index.html URL
 local SECRET_SALT     = 73915                            -- Must match SECRET_SALT in index.html
 local SAVE_FILE_NAME  = "SidsSuite_SavedKey.txt"
 
