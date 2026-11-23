@@ -1,6 +1,6 @@
 -- ============================================================
 -- SID'S AIMBOT & PERFORMANCE SUITE: ESCALATION LOCK EDITION
--- Complete Framework with Integrated Daily Key System
+-- Complete Framework with Integrated Master Key System
 -- ============================================================
 
 local Players          = game:GetService("Players")
@@ -18,10 +18,26 @@ Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 end)
 
 -- ============================================================
--- KEY SYSTEM CONFIGURATION (Must match index.html)
+-- AUTH BLOCK: PERMANENT MASTER KEYS (NEVER NEED A KEY FOREVER)
 -- ============================================================
-local KEY_WEBSITE_URL = "https://sid-key-portal.netlify.app/" -- Replace with your hosted index.html URL
-local SECRET_SALT     = 73915                            -- Must match SECRET_SALT in index.html
+local MASTER_KEYS = {
+    "SID-PERM-MASTER01-X92B",
+    "SID-PERM-MASTER02-K47M",
+    "SID-PERM-MASTER03-Q11V",
+    "SID-PERM-MASTER04-Z88P",
+    "SID-PERM-MASTER05-W33T",
+    "SID-PERM-MASTER06-L72N",
+    "SID-PERM-MASTER07-R49C",
+    "SID-PERM-MASTER08-F55X",
+    "SID-PERM-MASTER09-J16Y",
+    "SID-PERM-MASTER10-H34D"
+}
+
+-- ============================================================
+-- AUTH BLOCK: KEY SYSTEM CONFIGURATION (Must match index.html)
+-- ============================================================
+local KEY_WEBSITE_URL = "https://sid-key-portal.netlify.app/"
+local SECRET_SALT     = 73915                            
 local SAVE_FILE_NAME  = "SidsSuite_SavedKey.txt"
 
 local function GetExpectedDailyKey()
@@ -34,6 +50,16 @@ end
 local function IsKeyValid(inputKey)
     if type(inputKey) ~= "string" then return false end
     local cleaned = inputKey:gsub("%s+", ""):upper()
+    
+    -- Loop to verify if user entered a permanent key bypass
+    for _, masterKey in ipairs(MASTER_KEYS) do
+        if cleaned == masterKey then
+            print("[Sid's Suite] Permanent Master Key Detected. Bypass Activated.")
+            return true
+        end
+    end
+    
+    -- Fallback to the standard daily rotating algorithm
     return cleaned == GetExpectedDailyKey()
 end
 
@@ -103,7 +129,7 @@ local function getOptimalTarget()
     local CameraLookVector = CameraCFrame.LookVector
     
     local ClosestTarget = nil
-    local HighestAlignment = -2 -- Minimum dot product threshold floor
+    local HighestAlignment = -2 
     local TargetPlayerReference = nil
     
     for _, player in ipairs(Players:GetPlayers()) do
@@ -294,7 +320,6 @@ Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 end)
 
 local function InitializeSuiteDashboard()
-    -- Start combat & input loops only after valid key verification
     RunService.PreRender:Connect(function()
         local targetPart, targetPlayer = getOptimalTarget()
         
@@ -335,7 +360,6 @@ local function InitializeSuiteDashboard()
         if input.UserInputType == Settings.AimKey then States.IsAiming = false end
     end)
 
-    -- Build Main Dashboard Frame
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0, 275, 0, 485)
     MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -429,7 +453,6 @@ local function InitializeSuiteDashboard()
     local OpenStroke = Instance.new("UIStroke")
     OpenStroke.Thickness = 1.5; OpenStroke.Color = Color3.fromRGB(255, 10, 80); OpenStroke.Parent = OpenBtn
 
-    -- Touch Controls
     MobileToggle = Instance.new("TextButton")
     MobileToggle.Name = "MobileAimbotToggle"
     MobileToggle.Size = UDim2.new(0, 142, 0, 42)
@@ -465,29 +488,25 @@ local function InitializeSuiteDashboard()
     MobileToggle.Activated:Connect(function()
         Settings.AimbotEnabled = not Settings.AimbotEnabled
         MobileToggle.Text = Settings.AimbotEnabled and "AIMBOT: ON" or "AIMBOT: OFF"
-        MobileToggle.BackgroundColor3 = Settings.AimbotEnabled
-            and Color3.fromRGB(115, 15, 55) or Color3.fromRGB(25, 27, 35)
+        MobileToggle.BackgroundColor3 = Settings.AimbotEnabled and Color3.fromRGB(115, 15, 55) or Color3.fromRGB(25, 27, 35)
         if MenuToggleButtonUpdateRef then
             MenuToggleButtonUpdateRef(Settings.AimbotEnabled)
         end
     end)
 
     MobileAim.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch
-            or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             States.IsAiming = true
             MobileAim.Text = "AIMING..."
         end
     end)
     MobileAim.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch
-            or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             States.IsAiming = false
             MobileAim.Text = "HOLD TO AIM"
         end
     end)
 
-    -- Dragging Logic
     local dragToggle = nil
     local dragSpeed = 0.1
     local dragStart = nil
@@ -624,7 +643,7 @@ local function InitializeSuiteDashboard()
 end
 
 -- ============================================================
--- KEY VERIFICATION GATEWAY
+-- VERIFICATION GATEWAY ORCHESTRATION
 -- ============================================================
 local KeyVerified = false
 pcall(function()
